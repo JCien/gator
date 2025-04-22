@@ -1,12 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/JCien/gator/internal/config"
 )
+
+type state struct {
+	cfg *config.Config
+}
 
 func main() {
 	cfg, err := config.Read()
@@ -15,30 +18,27 @@ func main() {
 	}
 
 	//err = cfg.SetUser("Jesus")
-	newState := state{}
-	newState.cfg = &cfg
+	programState := &state{
+		cfg: &cfg,
+	}
 
 	myCommands := commands{
-		commandList: make(map[string]func(*state, command) error),
+		registeredCommands: make(map[string]func(*state, command) error),
 	}
 	
 	myCommands.register("login", handlerLogin)
 
-	argsMain := os.Args
-	if len(argsMain) < 2 {
-		log.Fatal("Not enough arguments provided")
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: cli <command> [args...]")
+		return
 	}
 
-	commandArgs := argsMain[1:]
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
 
-	commandHandler := &command{
-		name: commandArgs[0],
-		args: commandArgs,
-	}
-
-	err = myCommands.run(&newState, *commandHandler)
+	err = myCommands.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
-		fmt.Print(err)
+		log.Fatal(err)
 	}
 
 }

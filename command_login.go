@@ -1,20 +1,20 @@
 package main
 
 import (
-	"log"
 	"fmt")
 
 func handlerLogin(s *state, cmd command) error {
-	if len(cmd.args) <= 1 {
-		log.Fatal("login requires one argument, username")
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
 
-	username := cmd.args[1]
+	username := cmd.Args[0]
+
 	err := s.cfg.SetUser(username)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
-	fmt.Println("The user has been set")
+	fmt.Println("User switched successfully!")
 	return nil
 }
