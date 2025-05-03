@@ -1,9 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
-	"database/sql"
+
 	_ "github.com/lib/pq"
 
 	"github.com/JCien/gator/internal/config"
@@ -11,7 +12,7 @@ import (
 )
 
 type state struct {
-	db *database.Queries
+	db  *database.Queries
 	cfg *config.Config
 }
 
@@ -29,19 +30,21 @@ func main() {
 	dbQueries := database.New(db)
 
 	programState := &state{
-		db: dbQueries,
+		db:  dbQueries,
 		cfg: &cfg,
 	}
 
 	myCommands := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
-	
+
 	myCommands.register("login", handlerLogin)
 	myCommands.register("register", handlerRegister)
 	myCommands.register("reset", handlerReset)
 	myCommands.register("users", handlerListUsers)
 	myCommands.register("agg", handlerAgg)
+	myCommands.register("addfeed", handlerAddFeed)
+	myCommands.register("feeds", handlerListFeeds)
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")
@@ -55,5 +58,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
