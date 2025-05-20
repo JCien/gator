@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/JCien/gator/internal/database"
 	"github.com/google/uuid"
+
+	"github.com/JCien/gator/internal/database"
 )
 
 func handlerRegister(s *state, cmd command) error {
@@ -17,11 +18,11 @@ func handlerRegister(s *state, cmd command) error {
 	name := cmd.Args[0]
 
 	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
-			ID: uuid.New(),
-			CreatedAt: time.Now().UTC(),
-			UpdatedAt: time.Now().UTC(),
-			Name: name,
-		})
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      name,
+	})
 	if err != nil {
 		return fmt.Errorf("coundn't create user: %w", err)
 	}
@@ -38,7 +39,7 @@ func handlerRegister(s *state, cmd command) error {
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("usage: %s <name>", cmd.Name)
+		return fmt.Errorf("usage: %v <name>", cmd.Name)
 	}
 	name := cmd.Args[0]
 
@@ -70,7 +71,7 @@ func handlerListUsers(s *state, cmd command) error {
 	current := s.cfg.CurrentUserName
 
 	for _, user := range users {
-		if user.Name == current{
+		if user.Name == current {
 			fmt.Printf("* %s (current)\n", user.Name)
 		} else {
 			fmt.Printf("* %s\n", user.Name)
